@@ -339,4 +339,6 @@ def jobs_summary() -> str:
 
 # ── Entry point ───────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    port = int(os.getenv("PORT", 3100))
+    print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}/sse", flush=True)
+    mcp.run(transport="sse", host="0.0.0.0", port=port)
