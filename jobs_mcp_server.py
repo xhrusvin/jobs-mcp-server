@@ -344,12 +344,10 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 3100))
     print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}/sse", flush=True)
 
-    # Get the Starlette app from FastMCP
-    app = mcp.get_asgi_app()
-
+    # Works across all FastMCP versions
     uvicorn.run(
-        app,
+        "jobs_mcp_server:mcp.app",
         host="0.0.0.0",
         port=port,
-        forwarded_allow_ips="*",   # trust Nginx reverse proxy headers
+        forwarded_allow_ips="*",
     )
