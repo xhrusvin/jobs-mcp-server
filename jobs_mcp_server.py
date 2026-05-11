@@ -339,13 +339,17 @@ def jobs_summary() -> str:
 
 # ── Entry point ───────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    import uvicorn
+
     port = int(os.getenv("PORT", 3100))
     print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}/sse", flush=True)
 
-    mcp.settings.host = "0.0.0.0"
-    mcp.settings.port = port
+    # Get the Starlette app from FastMCP
+    app = mcp.get_asgi_app()
 
-    # Allow requests coming through Nginx reverse proxy
-    os.environ["FORWARDED_ALLOW_IPS"] = "*"
-
-    mcp.run(transport="sse")
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        forwarded_allow_ips="*",   # trust Nginx reverse proxy headers
+    )
