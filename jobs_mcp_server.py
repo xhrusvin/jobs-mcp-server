@@ -341,6 +341,11 @@ def jobs_summary() -> str:
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 3100))
     print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}/sse", flush=True)
+
     mcp.settings.host = "0.0.0.0"
     mcp.settings.port = port
+
+    # Allow requests coming through Nginx reverse proxy
+    os.environ["FORWARDED_ALLOW_IPS"] = "*"
+
     mcp.run(transport="sse")
