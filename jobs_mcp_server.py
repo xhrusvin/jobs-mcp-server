@@ -341,7 +341,7 @@ def jobs_summary() -> str:
 if __name__ == "__main__":
     import os
     port = int(os.getenv("PORT", 3100))
-    print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}/sse", flush=True)
+    print(f"[MCP] Starting SSE server on http://0.0.0.0:{port}", flush=True)
 
     # FastMCP uses settings object to configure host/port for SSE
     mcp.settings.host = "0.0.0.0"
