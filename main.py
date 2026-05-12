@@ -179,4 +179,6 @@ def get_todays_jobs() -> str:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http", host="127.0.0.1", port=3100, path="/mcp")
+    import uvicorn
+    app = mcp.streamable_http_app()
+    uvicorn.run(app, host="127.0.0.1", port=3100)
