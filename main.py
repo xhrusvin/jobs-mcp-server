@@ -30,12 +30,22 @@ mcp = FastMCP(
 )
 
 def serialize_doc(doc: dict) -> dict:
+    """Convert MongoDB document to JSON-serializable dict."""
     doc = dict(doc)
-    if "_id" in doc:
-        doc["_id"] = str(doc["_id"])
     for key, value in doc.items():
-        if isinstance(value, datetime):
+        if isinstance(value, ObjectId):
+            doc[key] = str(value)
+        elif isinstance(value, datetime):
             doc[key] = value.isoformat()
+        elif isinstance(value, dict):
+            doc[key] = serialize_doc(value)
+        elif isinstance(value, list):
+            doc[key] = [
+                serialize_doc(i) if isinstance(i, dict)
+                else str(i) if isinstance(i, ObjectId)
+                else i
+                for i in value
+            ]
     return doc
 
 
