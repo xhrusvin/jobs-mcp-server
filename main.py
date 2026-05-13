@@ -24,9 +24,19 @@ mcp = FastMCP(
     instructions="You help manage care job assignments at ExpressHealth. "
                  "Use the available tools to list, search, create, and update care jobs.",
     transport_security=TransportSecuritySettings(
-        enable_dns_rebinding_protection=True,
-        allowed_hosts=["expresshealth.ie", "www.expresshealth.ie", "127.0.0.1", "localhost", "127.0.0.1:3100"],
-    ),
+    enable_dns_rebinding_protection=True,
+    allowed_hosts=[
+        "expresshealth.ie",
+        "www.expresshealth.ie",
+        "127.0.0.1",
+        "localhost",
+        "127.0.0.1:3100",
+        "chatgpt.com",
+        "*.chatgpt.com",
+        "openai.com",
+        "*.openai.com",
+    ],
+),
 )
 
 def serialize_doc(doc: dict) -> dict:
