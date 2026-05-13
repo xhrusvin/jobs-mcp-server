@@ -20,7 +20,7 @@ mcp = FastMCP(
     name="ExpressHealth Jobs MCP",
     instructions="You help manage care job assignments at ExpressHealth. "
                  "Use the available tools to list, search, create, and update care jobs.",
-    dns_rebinding_protection=False,
+    allowed_hosts=["expresshealth.ie", "www.expresshealth.ie", "127.0.0.1", "localhost", "127.0.0.1:3100"],
 )
 
 
