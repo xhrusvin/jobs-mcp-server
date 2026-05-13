@@ -122,8 +122,10 @@ def get_todays_jobs() -> str:
 
 if __name__ == "__main__":
     app = mcp.streamable_http_app()
-    app.add_middleware(
-        TrustedHostMiddleware,
-        allowed_hosts=["expresshealth.ie", "www.expresshealth.ie", "127.0.0.1", "localhost"]
+    uvicorn.run(
+        app,
+        host="127.0.0.1",
+        port=3100,
+        forwarded_allow_ips="*",
+        proxy_headers=True,
     )
-    uvicorn.run(app, host="127.0.0.1", port=3100)
