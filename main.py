@@ -22,7 +22,11 @@ from mcp.server.transport_security import TransportSecuritySettings
 mcp = FastMCP(
     name="ExpressHealth Jobs MCP",
     instructions="You help manage care job assignments at ExpressHealth. "
-                 "Use the available tools to list, search, create, and update care jobs."
+                 "Use the available tools to list, search, create, and update care jobs.",
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=False,
+    ),
+    stateless_http=True,
 )
 
 
