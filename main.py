@@ -24,7 +24,7 @@ mcp = FastMCP(
     instructions="You help manage care job assignments at ExpressHealth. "
                  "Use the available tools to list, search, create, and update care jobs.",
     transport_security=TransportSecuritySettings(
-    enable_dns_rebinding_protection=True,
+    enable_dns_rebinding_protection=False,
     allowed_hosts=[
         "expresshealth.ie",
         "www.expresshealth.ie",
