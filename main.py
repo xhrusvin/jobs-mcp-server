@@ -22,27 +22,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 mcp = FastMCP(
     name="ExpressHealth Jobs MCP",
     instructions="You help manage care job assignments at ExpressHealth. "
-                 "Use the available tools to list, search, create, and update care jobs.",
-    transport_security=TransportSecuritySettings(
-    enable_dns_rebinding_protection=False,
-    allowed_hosts=[
-        "expresshealth.ie",
-        "www.expresshealth.ie",
-        "127.0.0.1",
-        "localhost",
-        "127.0.0.1:3100",
-        # Postman
-        "*.postman.com",
-        "postman.com",
-        "*.postmanecho.com",
-        # ChatGPT
-        "chatgpt.com",
-        "*.chatgpt.com",
-        # OpenAI
-        "openai.com",
-        "*.openai.com",
-    ],
-),
+                 "Use the available tools to list, search, create, and update care jobs."
 )
 
 
