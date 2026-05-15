@@ -31,13 +31,21 @@ mcp = FastMCP(
         "127.0.0.1",
         "localhost",
         "127.0.0.1:3100",
+        # Postman
+        "*.postman.com",
+        "postman.com",
+        "*.postmanecho.com",
+        # ChatGPT
         "chatgpt.com",
         "*.chatgpt.com",
+        # OpenAI
         "openai.com",
         "*.openai.com",
     ],
 ),
 )
+
+
 
 def serialize_doc(doc: dict) -> dict:
     """Convert MongoDB document to JSON-serializable dict."""
