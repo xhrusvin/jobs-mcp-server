@@ -30,6 +30,32 @@ mcp = FastMCP(
 )
 
 
+@mcp.tool(description="List care jobs filtered by status and/or job type. Use this for any query about jobs, assignments or tasks.")
+def list_jobs(status: str = None, job_type: str = None, limit: int = 20) -> str:
+    ...
+
+@mcp.tool(description="Get a specific care job by its ID.")
+def get_job(job_id: str) -> str:
+    ...
+
+@mcp.tool(description="Search care jobs by client name, location or date.")
+def search_jobs(client_name: str = None, location: str = None, date: str = None) -> str:
+    ...
+
+@mcp.tool(description="Create a new care job assignment.")
+def create_job(title: str, client_name: str, job_type: str, location: str,
+               scheduled_date: str, description: str, notes: str = "") -> str:
+    ...
+
+@mcp.tool(description="Update the status of an existing care job. Allowed statuses: Pending, In Progress, Completed, Cancelled.")
+def update_job_status(job_id: str, status: str) -> str:
+    ...
+
+@mcp.tool(description="Get all care jobs scheduled for today.")
+def get_todays_jobs() -> str:
+    ...
+
+
 
 def serialize_doc(doc: dict) -> dict:
     """Convert MongoDB document to JSON-serializable dict."""
