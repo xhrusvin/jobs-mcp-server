@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 import json
 from mcp.server.fastmcp import FastMCP
-from starlette.middleware.trustedhost import TrustedHostMiddleware
+from mcp.server.transport_security import TransportSecuritySettings
 import uvicorn
 
 load_dotenv()
@@ -16,45 +16,15 @@ db = client[os.getenv("MONGO_DB", "expresshealth")]
 collection = db[os.getenv("MONGO_COLLECTION", "jobs")]
 
 # MCP Server
-from mcp.server.fastmcp import FastMCP
-from mcp.server.transport_security import TransportSecuritySettings
-
 mcp = FastMCP(
     name="ExpressHealth Jobs MCP",
     instructions="You help manage care job assignments at ExpressHealth. "
-                 "Use the available tools to list, search, create, and update care jobs.",
+                 "Use the available tools to list, search, and fetch care jobs.",
     transport_security=TransportSecuritySettings(
         enable_dns_rebinding_protection=False,
     ),
     stateless_http=True,
 )
-
-
-@mcp.tool(description="List care jobs filtered by status and/or job type. Use this for any query about jobs, assignments or tasks.")
-def list_jobs(status: str = None, job_type: str = None, limit: int = 20) -> str:
-    ...
-
-@mcp.tool(description="Get a specific care job by its ID.")
-def get_job(job_id: str) -> str:
-    ...
-
-@mcp.tool(description="Search care jobs by client name, location or date.")
-def search_jobs(client_name: str = None, location: str = None, date: str = None) -> str:
-    ...
-
-@mcp.tool(description="Create a new care job assignment.")
-def create_job(title: str, client_name: str, job_type: str, location: str,
-               scheduled_date: str, description: str, notes: str = "") -> str:
-    ...
-
-@mcp.tool(description="Update the status of an existing care job. Allowed statuses: Pending, In Progress, Completed, Cancelled.")
-def update_job_status(job_id: str, status: str) -> str:
-    ...
-
-@mcp.tool(description="Get all care jobs scheduled for today.")
-def get_todays_jobs() -> str:
-    ...
-
 
 
 def serialize_doc(doc: dict) -> dict:
@@ -77,7 +47,7 @@ def serialize_doc(doc: dict) -> dict:
     return doc
 
 
-@mcp.tool()
+@mcp.tool(description="List care jobs filtered by status and/or job type. Use this for any query about jobs, assignments or tasks.")
 def list_jobs(status: str = None, job_type: str = None, limit: int = 20) -> str:
     query = {"is_active": True}
     if status:
@@ -88,8 +58,8 @@ def list_jobs(status: str = None, job_type: str = None, limit: int = 20) -> str:
     return json.dumps([serialize_doc(j) for j in jobs], indent=2)
 
 
-@mcp.tool()
-def get_job(job_id: str) -> str:
+@mcp.tool(description="Fetch a specific care job by its ID.")
+def fetch(job_id: str) -> str:
     try:
         job = collection.find_one({"_id": ObjectId(job_id)})
         if not job:
@@ -99,8 +69,8 @@ def get_job(job_id: str) -> str:
         return json.dumps({"error": str(e)})
 
 
-@mcp.tool()
-def search_jobs(client_name: str = None, location: str = None, date: str = None) -> str:
+@mcp.tool(description="Search care jobs by client name, location or date.")
+def search(client_name: str = None, location: str = None, date: str = None) -> str:
     query = {"is_active": True}
     if client_name:
         query["client_name"] = {"$regex": client_name, "$options": "i"}
@@ -114,53 +84,6 @@ def search_jobs(client_name: str = None, location: str = None, date: str = None)
         except ValueError:
             return json.dumps({"error": "Invalid date format. Use YYYY-MM-DD."})
     jobs = list(collection.find(query))
-    return json.dumps([serialize_doc(j) for j in jobs], indent=2)
-
-
-@mcp.tool()
-def create_job(title: str, client_name: str, job_type: str, location: str,
-               scheduled_date: str, description: str, notes: str = "") -> str:
-    try:
-        now = datetime.utcnow()
-        doc = {
-            "title": title, "client_name": client_name, "job_type": job_type,
-            "status": "Pending", "location": location,
-            "scheduled_date": datetime.strptime(scheduled_date, "%Y-%m-%d"),
-            "description": description, "notes": notes,
-            "is_active": True, "created_at": now, "updated_at": now,
-        }
-        result = collection.insert_one(doc)
-        return json.dumps({"success": True, "inserted_id": str(result.inserted_id)})
-    except Exception as e:
-        return json.dumps({"error": str(e)})
-
-
-@mcp.tool()
-def update_job_status(job_id: str, status: str) -> str:
-    allowed = {"Pending", "In Progress", "Completed", "Cancelled"}
-    if status not in allowed:
-        return json.dumps({"error": f"Invalid status. Must be one of: {allowed}"})
-    try:
-        result = collection.update_one(
-            {"_id": ObjectId(job_id)},
-            {"$set": {"status": status, "updated_at": datetime.utcnow()}},
-        )
-        if result.matched_count == 0:
-            return json.dumps({"error": "Job not found"})
-        return json.dumps({"success": True, "modified": result.modified_count})
-    except Exception as e:
-        return json.dumps({"error": str(e)})
-
-
-@mcp.tool()
-def get_todays_jobs() -> str:
-    now = datetime.utcnow()
-    start = datetime(now.year, now.month, now.day, 0, 0, 0)
-    end = datetime(now.year, now.month, now.day, 23, 59, 59)
-    jobs = list(collection.find({
-        "is_active": True,
-        "scheduled_date": {"$gte": start, "$lte": end}
-    }))
     return json.dumps([serialize_doc(j) for j in jobs], indent=2)
 
 
