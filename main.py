@@ -168,7 +168,7 @@ if __name__ == "__main__":
     app = mcp.streamable_http_app()
     uvicorn.run(
         app,
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=3100,
         forwarded_allow_ips="*",
         proxy_headers=True,
