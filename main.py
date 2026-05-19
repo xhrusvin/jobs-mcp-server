@@ -69,20 +69,17 @@ def fetch(job_id: str) -> str:
         return json.dumps({"error": str(e)})
 
 
-@mcp.tool(description="Search care jobs by client name, location or date.")
-def search(client_name: str = None, location: str = None, date: str = None) -> str:
+@mcp.tool(description="Search care jobs by a keyword across client name, location, title, description, and notes.")
+def search(keyword: str = None) -> str:
     query = {"is_active": True}
-    if client_name:
-        query["client_name"] = {"$regex": client_name, "$options": "i"}
-    if location:
-        query["location"] = {"$regex": location, "$options": "i"}
-    if date:
-        try:
-            start = datetime.strptime(date, "%Y-%m-%d")
-            end = datetime(start.year, start.month, start.day, 23, 59, 59)
-            query["scheduled_date"] = {"$gte": start, "$lte": end}
-        except ValueError:
-            return json.dumps({"error": "Invalid date format. Use YYYY-MM-DD."})
+    if keyword:
+        query["$or"] = [
+            {"client_name": {"$regex": keyword, "$options": "i"}},
+            {"location": {"$regex": keyword, "$options": "i"}},
+            {"title": {"$regex": keyword, "$options": "i"}},
+            {"description": {"$regex": keyword, "$options": "i"}},
+            {"notes": {"$regex": keyword, "$options": "i"}},
+        ]
     jobs = list(collection.find(query))
     return json.dumps([serialize_doc(j) for j in jobs], indent=2)
 
