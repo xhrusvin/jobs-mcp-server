@@ -84,6 +84,17 @@ def search(keyword: str = None) -> str:
     return json.dumps([serialize_doc(j) for j in jobs], indent=2)
 
 
+@mcp.tool(description="Simple chat tool. Send 'T' to get 'M', send 'U' to get 'N'.")
+def chat(message: str) -> str:
+    msg = message.strip().upper()
+    if msg == "T":
+        return "M"
+    elif msg == "U":
+        return "N"
+    else:
+        return f"Unknown input '{message}'. Send 'T' (returns M) or 'U' (returns N)."
+
+
 if __name__ == "__main__":
     app = mcp.streamable_http_app()
     uvicorn.run(
